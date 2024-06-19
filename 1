@@ -1,0 +1,163 @@
+getgenv().config = {
+    autoEgg = true,
+    targetEgg = "Arcade Egg 5",
+    ForceHop = 180, -- [SECONDS]
+
+    -- Mailbox
+    autoMailbox = false,
+    receiverUsernames = {""},
+    message = "msg works nicee",
+    everyNumEggs = 10,
+
+    -- Webhook
+    EnableWebhook = true,
+    NotifWebhookURL = "https://discord.com/api/webhooks/1228792438550827058/vEFoNDkMblX284s0CPC2-neIBGJ3eZ1zQLcqCdmicYwK5mrYl1IafQWS3uO5lzhnsGvV",
+    AlertWebhookURL = "https://discord.com/api/webhooks/1228792438550827058/vEFoNDkMblX284s0CPC2-neIBGJ3eZ1zQLcqCdmicYwK5mrYl1IafQWS3uO5lzhnsGvV",
+    DiscordID = "514517240574509082"
+}
+
+repeat task.wait() until game:IsLoaded()
+repeat task.wait() until game.PlaceId ~= nil
+repeat task.wait() until game:GetService("Players").LocalPlayer
+local Player = game.Players.LocalPlayer
+repeat task.wait() until not game.Players.LocalPlayer.PlayerGui:FindFirstChild("__INTRO")
+local HRP = Player.Character.HumanoidRootPart
+local RepStor = game:GetService("ReplicatedStorage")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local Library = require(RepStor.Library)
+local saveMod = require(RepStor.Library.Client.Save)
+repeat task.wait() until Library.Loaded
+local Active = workspace.__THINGS.__INSTANCE_CONTAINER.Active
+local xRange = {min = 183, max = 212, def = 164}
+local zRange = {min = -1947, max = -1918, def = -1967}
+task.wait(1000)
+WebhookAlreadySent = false
+
+local MachineCmds = require(game.ReplicatedStorage.Library.Client.InstancingCmds)
+
+function Enter(Name)
+    pcall(function() 
+        MachineCmds.Enter(Name)
+    end)
+end
+
+function Leave(Name)
+    pcall(function() 
+        MachineCmds.Leave(Name)
+    end)
+end
+
+function RequestWebhook(WebUrl, Body) 
+    pcall(function()
+        local response = request({
+            Url = WebUrl,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = Body
+        })
+    end)
+end
+
+function floorVector3(v3) return Vector3.new(math.floor(v3.X), math.floor(v3.Y), math.floor(v3.Z)) end
+
+function sendNotif(url, msg) 
+    request({
+        Url = url,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = HttpService:JSONEncode({content = msg})
+    }) 
+end
+
+function getItemInfo(class, itemName, info)
+    local inventory = saveMod.Get()["Inventory"]
+    if inventory[class] then -- just add this check so it doesn't iterate over nil
+        for i,v in pairs(inventory[class]) do
+            if v.id == itemName then
+                if info == "uid" then
+                    return i
+                else
+                    return v[info]
+                end
+            end
+        end
+    end
+end
+
+function GetQuantity(ItemName, class)
+    for i, v in pairs(require(game.ReplicatedStorage:WaitForChild('Library')).Save.Get().Inventory[class]) do
+        if v.id == ItemName then
+            return v._am or 1
+        end
+    end
+    return 0
+end
+
+function GetAssetID(PetName, PetType)
+    local PetAssetID
+    local miscItems = require(game.ReplicatedStorage.Library.Directory.MiscItems)
+    if miscItems[PetName] then
+        PetAssetID = miscItems[PetName].Icon
+    end
+    if PetAssetID then
+        return string.gsub(PetAssetID, "rbxassetid://", "")
+    end
+end
+
+function TPMailboxW1()
+    startTime = os.time()
+    repeat task.wait() until workspace:FindFirstChild("Map") or (os.time() - startTime) >= 2
+    repeat task.wait() until workspace.Map:FindFirstChild("1 | Spawn") or (os.time() - startTime) >= 4
+    repeat task.wait() until workspace.Map["1 | Spawn"]:FindFirstChild("INTERACT") or (os.time() - startTime) >= 6
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Map["1 | Spawn"].INTERACT.Machines.MailboxMachine.WorldPivot + Vector3.new(12, 0, 0)
+end
+
+function TPMailboxW2()
+    startTime = os.time()
+    repeat task.wait() until workspace:FindFirstChild("Map2") or (os.time() - startTime) >= 2
+    repeat task.wait() until workspace.Map2:FindFirstChild("100 | Tech Spawn") or (os.time() - startTime) >= 4
+    repeat task.wait() until workspace.Map2["100 | Tech Spawn"]:FindFirstChild("INTERACT") or (os.time() - startTime) >= 6
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Map2["100 | Tech Spawn"].INTERACT.Machines.MailboxMachine.WorldPivot + Vector3.new(12, 0, 0)
+end
+
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            game:GetService("ReplicatedStorage").Network["Mailbox: Claim All"]:InvokeServer()
+        end)
+        task.wait(60)
+    end
+end)
+
+sEggAmt = GetQuantity("Arcade Egg 5", "Lootbox")
+sTokenAmt = GetQuantity("Arcade Token", "Misc")
+
+print("Current Targeted Eggs :", sEggAmt)
+print("Current Arcade Tokens :", sTokenAmt)
+
+if sTokenAmt == 0 and config.EnableWebhook then
+    print("Ran Out of Tokens")
+    local message1 = {
+        content = "<@".. config.DiscordID ..">",
+        embeds = {
+            {
+                title = "<:alert:1243650238359797900>  No Arcade Tokens Left  <:alert:1243650238359797900>",
+                color = 0xFF0000,
+                timestamp = DateTime.now():ToIsoDate(),
+                thumbnail = {
+                    url = "https://biggamesapi.io/image/" .. GetAssetID("Arcade Token"),
+                },
+                fields = {
+                    { name = "Roblox Username: ``" .. game.Players.LocalPlayer.Name .. "``", value = ""},
+                    { name = "<:egg50x:1243652409826213929> Total Arcade Eggs: ``" .. tostring(GetQuantity("Arcade Egg 5", "Lootbox")) .. "``", value = ""},
+                },
+                footer = {
+                    text = "Arcade egg grabber Test 1"
+                }
+            }
+        }
+    }
+    jsonMessage = game:GetService("HttpService"):JSONEncode(message1)
