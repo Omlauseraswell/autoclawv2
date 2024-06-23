@@ -209,8 +209,8 @@ while true do
 
                     local startAttempt = os.time()
                     repeat 
-                        task.wait(2) 
-                        print("Waiting for Reset") 
+                        task.wait(3) 
+                        print("Waiting for Claw to reset") 
                         Library.Network.Fire("Instancing_FireCustomFromClient", "ClawMachine", "Claw: Go")
                         if (os.time() - startAttempt >= 9) then
                             break
