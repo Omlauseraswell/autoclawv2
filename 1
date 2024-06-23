@@ -171,7 +171,7 @@ task.spawn(function()
 end)
 
 while true do 
-    print("Looping...")
+    print("Going again...")
     if Active:FindFirstChild("ClawMachine") then
         print("In ClawMachine Area")
 		local clawHolder = Active.ClawMachine.Claws.Claw.Holder
@@ -183,14 +183,14 @@ while true do
 			or eggPos.Y < zRange.min and eggPos.X < xRange.min
 			or eggPos.X > xRange.max or eggPos.Y > zRange.max
 			or eggPos.X < xRange.def or eggPos.Y < zRange.def then
-				print(`bad egg die in fire`) targetEgg:Destroy()
+				print(`egg die in fire`) targetEgg:Destroy()
 			else
 				print(`{targetEgg.Name} | {eggPos} : is Good`)
 
                 repeat task.wait() until math.abs(clawHolder.Position.X - xRange.def) <= 3 and math.abs(clawHolder.Position.Z - zRange.def) <= 5 or not Active:FindFirstChild("ClawMachine")
 
                 if Player.PlayerGui._INSTANCES.ClawMachine.Enabled then
-                    print(`PlayerGui Enabled`)
+                    print(`AutoClaw Enabled`)
 					if clawHolder.Position.X < eggPos.X then
 						print(`{floorVector3(clawHolder.Position)} | {eggPos} : Need to move Claw Forward`)
 						Library.Network.Fire("Instancing_FireCustomFromClient", "ClawMachine", "Claw: Direction", "Forward")
@@ -205,7 +205,7 @@ while true do
 						Library.Network.Fire("Instancing_FireCustomFromClient", "ClawMachine", "Claw: Direction")
 					end
 
-					task.wait(10) Library.Network.Fire("Instancing_FireCustomFromClient", "ClawMachine", "Claw: Go") print("Resetting")
+					task.wait(10) Library.Network.Fire("Instancing_FireCustomFromClient", "ClawMachine", "Claw: Go") print("Resetting attempt")
 
                     local startAttempt = os.time()
                     repeat 
