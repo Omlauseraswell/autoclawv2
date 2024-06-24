@@ -183,7 +183,7 @@ while true do
 			or eggPos.Y < zRange.min and eggPos.X < xRange.min
 			or eggPos.X > xRange.max or eggPos.Y > zRange.max
 			or eggPos.X < xRange.def or eggPos.Y < zRange.def then
-				print(`egg die in fire`) targetEgg:Destroy()
+				print(`unable to grab`) targetEgg:Destroy()
 			else
 				print(`{targetEgg.Name} | {eggPos} : is Good`)
 
@@ -266,7 +266,7 @@ while true do
 	else
         Enter("ClawMachine")
         local startAttempt = os.time()
-        repeat task.wait(.1) until Active:FindFirstChild("ClawMachine") or (os.time() - startAttempt >= 3 and not Active:FindFirstChild("ClawMachine"))
+        repeat task.wait(.1) until Active:FindFirstChild("ClawMachine") or (os.time() - startAttempt >= 5 and not Active:FindFirstChild("ClawMachine"))
         if not Active:FindFirstChild("ClawMachine") then
             repeat task.wait(1) print("Entering Minigame..") Enter("ClawMachine") until Active:FindFirstChild("ClawMachine")
         end
