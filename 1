@@ -253,7 +253,7 @@ while true do
                         game:GetService("ReplicatedStorage").Network["Mailbox: Send"]:InvokeServer(config.receiverUsername, config.message, "Lootbox", getItemInfo("Lootbox", config.targetEgg, "uid"), GetQuantity("Arcade Egg 5", "Lootbox"))
                     end
 				else
-                    Library.Network.Fire("Instancing_FireCustomFromClient", "ClawMachine", "Claw: Request Play") task.wait(1)
+                    Library.Network.Fire("Instancing_FireCustomFromClient", "ClawMachine", "Claw: Request Play") task.wait(3)
 				end
 			end
 		else
